@@ -113,11 +113,15 @@ class GraphNorm(torch.nn.Module):
       self.norm = torch.nn.BatchNorm1d(in_channels)  # , bn_eps, bn_momentum)
     elif self.norm_type == 'group_norm':
       self.norm = ocnn.nn.OctreeGroupNorm(in_channels, self.group)
+    elif self.norm_type == 'layer_norm':
+      self.norm = torch.nn.LayerNorm(in_channels)
+    elif self.norm_type == 'rms_norm':
+      self.norm = torch.nn.RMSNorm(in_channels)
     else:
       raise ValueError
 
   def forward(self, x: torch.Tensor, octree: OctreeD, depth: int):
-    if self.norm_type == 'batch_norm':
+    if self.norm_type in ['batch_norm', 'layer_norm', 'rms_norm']:
       output = self.norm(x)
     elif self.norm_type == 'group_norm':
       output = self.norm(x, octree, depth)
